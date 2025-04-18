@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Object Remover</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #fff;
+            font-family: 'Orbitron', sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+
+        canvas {
+            border: 2px solid #00ffc3;
+            border-radius: 10px;
+            cursor: crosshair;
+        }
+
+        input[type="file"], button {
+            margin: 10px;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            background-color: #00ffc3;
+            color: black;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #00bfa6;
+        }
+
+        h1 {
+            color: #00ffc3;
+            font-size: 2em;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px #00ffc3;
+        }
+
+        #status {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #00ffc3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Remove Object from Image</h1>
+    <input type="file" id="upload" accept="image/*" />
+    <br>
+    <canvas id="canvas"></canvas>
+    <br>
+    <button id="clearBtn">Reset Drawing</button>
+    <button id="removeBtn">Remove Object</button>
+    <h3 id="status"></h3>
+
+    <script>
+        let canvas = document.getElementById('canvas');
+        let ctx = canvas.getContext('2d');
+        let drawing = false;
+        let image = new Image();
+        let maskCanvas = document.createElement('canvas');
+        let maskCtx = maskCanvas.getContext('2d');
+
+        document.getElementById('upload').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (evt) {
+                    image.onload = function () {
+                        canvas.width = image.width;
+                        canvas.height = image.height;
+                        maskCanvas.width = image.width;
+                        maskCanvas.height = image.height;
+                        ctx.drawImage(image, 0, 0);
+                    }
+                    image.src = evt.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        canvas.addEventListener('mousedown', () => drawing = true);
+        canvas.addEventListener('mouseup', () => drawing = false);
+        canvas.addEventListener('mouseout', () => drawing = false);
+        canvas.addEventListener('mousemove', draw);
+
+        function draw(e) {
+            if (!drawing) return;
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.6)';
+            ctx.fill();
+
+            maskCtx.beginPath();
+            maskCtx.arc(x, y, 10, 0, Math.PI * 2);
+            maskCtx.fillStyle = 'white';
+            maskCtx.fill();
+        }
+
+        document.getElementById('clearBtn').onclick = () => {
+            ctx.drawImage(image, 0, 0);
+            maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
+            document.getElementById('status').innerText = '';
+        };
+
+        document.getElementById('removeBtn').onclick = async () => {
+            const imageData = canvas.toDataURL('image/png');
+            const maskData = maskCanvas.toDataURL('image/png');
+
+            const response = await fetch('/remove_object', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ image: imageData, mask: maskData })
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                image.src = result.output_url;
+                image.onload = () => ctx.drawImage(image, 0, 0);
+                document.getElementById('status').innerText = "✅ Object removed!";
+            } else {
+                document.getElementById('status').innerText = "❌ Error: " + result.error;
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deepfake Image Detection</title>
+</head>
+<body>
+  <h2>Upload Image for Deepfake Detection</h2>
+  <form id="uploadForm" enctype="multipart/form-data">
+    <input type="file" name="file" required><br><br>
+    <button type="submit">Check</button>
+  </form>
+  <div id="result"></div>
+
+  <script>
+    const form = document.getElementById('uploadForm');
+    const resultDiv = document.getElementById('result');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+
+      const res = await fetch('/predict', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await res.json();
+      resultDiv.innerHTML = `<p><strong>Label:</strong> ${data.label}</p>
+                             <p><strong>Confidence:</strong> ${data.confidence.toFixed(2)}</p>
+                             <img src="${data.file_path}" width="300"/>`;
+    });
+  </script>
+</body>
+</html>

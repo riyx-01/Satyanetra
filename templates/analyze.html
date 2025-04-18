@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Analyze - Deepfake, Cartoonize, Blur, Transpose, Video</title>
+  <!-- Google Fonts for a cleaner, modern look -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* 
+      Base resets and layout
+    */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #111
+        url('https://images.unsplash.com/photo-1581562330729-16e2f758b2f9?ixlib=rb-4.0.3&auto=format&fit=crop&w=1740&q=80')
+        no-repeat center center fixed;
+      background-size: cover;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      position: relative;
+      padding: 40px 20px;
+    }
+
+    /* 
+      Dark overlay for better contrast 
+    */
+    .overlay {
+      background: rgba(0, 0, 0, 0.6);
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+    }
+
+    /* 
+      Main container to hold all content
+    */
+    .container {
+      position: relative;
+      z-index: 2;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 10px;
+      text-align: center;
+      background: rgba(0, 0, 0, 0.4);
+      box-shadow: 0 0 20px rgba(0, 255, 195, 0.2), 0 0 40px rgba(0, 255, 195, 0.1);
+    }
+
+    /* 
+      Page heading 
+    */
+    h1 {
+      margin-bottom: 30px;
+      font-size: 2.2rem;
+      text-shadow: 0 0 10px #00ffc3, 0 0 20px #00ffc3;
+    }
+
+    /* 
+      Each feature in its own .section 
+    */
+    .section {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ffc3, 0 0 30px #00ffc3;
+    }
+
+    .section h2 {
+      font-size: 1.4rem;
+      margin-bottom: 15px;
+      color: #00ffc3;
+      text-shadow: 0 0 10px #00ffc3, 0 0 20px #00ffc3;
+    }
+
+    /* 
+      Inputs and buttons 
+    */
+    input[type="file"], button {
+      margin: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.95rem;
+      cursor: pointer;
+      font-weight: 500;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    input[type="file"] {
+      background: #1b1b1b;
+      color: #ccc;
+      box-shadow: 0 0 5px #00ffc3, 0 0 10px #00ffc3 inset;
+    }
+    input[type="file"]:hover {
+      box-shadow: 0 0 15px #00ffc3, 0 0 20px #00ffc3 inset;
+      color: #fff;
+    }
+
+    button {
+      background: #00ffc3;
+      color: #111;
+      box-shadow: 0 0 10px #00ffc3, 0 0 20px #00ffc3;
+    }
+    button:hover {
+      background: #00b38c;
+      color: #fff;
+      box-shadow: 0 0 20px #00ffc3, 0 0 30px #00ffc3;
+    }
+
+    /* 
+      Media previews 
+    */
+    img, video {
+      margin-top: 20px;
+      max-width: 400px;
+      border: 2px solid #00ffc3;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #00ffc3, 0 0 30px #00ffc3;
+    }
+
+    /* 
+      Results area 
+    */
+    #result {
+      margin-top: 30px;
+      padding: 20px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 10px #00ffc3, 0 0 30px #00ffc3;
+      min-height: 60px;
+    }
+
+    #result h3 {
+      text-shadow: 0 0 5px #00ffc3, 0 0 10px #00ffc3;
+      margin-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="overlay"></div>
+  <div class="container">
+    <h1>Analyze Media</h1>
+
+    <!-- Section: Image Upload & Analysis -->
+    <div class="section" id="image-section">
+      <h2>Image Upload</h2>
+      <input type="file" id="imageInput" accept="image/*" />
+      <br />
+      <button id="deepfakeBtn">Detect Deepfake</button>
+      <button id="cartoonBtn">Cartoonize</button>
+      <button id="blurBtn">Blur Faces</button>
+      <button id="metadataBtn">Detect Metadata</button>
+      <button id="transposeBtn">Transpose Image</button>
+      <img id="preview" src="#" alt="Preview" style="display:none;" />
+    </div>
+
+    <!-- Section: Video Upload & Analysis -->
+    <div class="section" id="video-section">
+      <h2>Video Upload</h2>
+      <input type="file" id="videoInput" accept="video/*" />
+      <br />
+      <button id="videoDeepfakeBtn">Detect Video Deepfake</button>
+      <video id="videoPreview" controls style="display:none;"></video>
+    </div>
+
+    <!-- Section: Compare Two Images -->
+    <div class="section" id="compare-section">
+      <h2>Compare Two Images</h2>
+      <input type="file" id="compareImage1" accept="image/*" />
+      <input type="file" id="compareImage2" accept="image/*" />
+      <br />
+      <button id="compareBtn">Compare</button>
+    </div>
+
+    <!-- Results Display -->
+    <div id="result"></div>
+  </div>
+
+  <script>
+    /*
+      JavaScript: 
+      Identical functionality, just reusing the same IDs, events, and fetch calls.
+    */
+    let uploadedFile = null;
+    const preview = document.getElementById('preview');
+    const videoPreview = document.getElementById('videoPreview');
+
+    // Image Input
+    document.getElementById('imageInput').addEventListener('change', (e) => {
+      uploadedFile = e.target.files[0];
+      preview.style.display = 'none';
+      videoPreview.style.display = 'none';
+
+      if (uploadedFile && uploadedFile.type.startsWith("image")) {
+        const reader = new FileReader();
+        reader.onload = () => {
+          preview.src = reader.result;
+          preview.style.display = 'block';
+        };
+        reader.readAsDataURL(uploadedFile);
+      }
+    });
+
+
+    // Blur Faces
+    document.getElementById('blurBtn').addEventListener('click', async () => {
+      if (!uploadedFile) return alert("Please select an image.");
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+      const response = await fetch('/blur', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (data.output) {
+        document.getElementById('result').innerHTML = `
+          <h3>Blurred Faces Result</h3>
+          <img src="${data.output}" />
+        `;
+      } else {
+        alert("Blurring failed.");
+      }
+    });
+
+    // Metadata
+    document.getElementById('metadataBtn').addEventListener('click', async () => {
+      if (!uploadedFile) return alert("Please select an image.");
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+      const response = await fetch('/metadata', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (data.metadata) {
+        const formatted = Object.entries(data.metadata)
+          .map(([key, value]) => `<p><strong>${key}:</strong> ${value}</p>`)
+          .join('');
+        document.getElementById('result').innerHTML = `
+          <h3>Extracted Metadata</h3>${formatted}
+        `;
+      } else {
+        alert("Metadata extraction failed.");
+      }
+    });
+
+    // Transpose Image
+    document.getElementById('transposeBtn').addEventListener('click', async () => {
+      if (!uploadedFile) return alert("Please select an image.");
+      const formData = new FormData();
+      formData.append('file', uploadedFile);
+      const response = await fetch('/transpose', { method: 'POST', body: formData });
+      const data = await response.json();
+      if (data.transposed) {
+        document.getElementById('result').innerHTML = `
+          <h3>Transposed Image</h3>
+          <img src="${data.transposed}" />
+        `;
+      } else {
+        alert("Transposing failed.");
+      }
+    });
+
+    // Video Input
+    document.getElementById('videoInput').addEventListener('change', (e) => {
+      const videoFile = e.target.files[0];
+      uploadedFile = videoFile;
+      preview.style.display = 'none';
+      videoPreview.style.display = 'none';
+
+      if (videoFile && videoFile.type.startsWith("video")) {
+        const videoURL = URL.createObjectURL(videoFile);
+        videoPreview.src = videoURL;
+        videoPreview.style.display = 'block';
+      }
+    });
+
+    // Video Deepfake
+    document.getElementById('videoDeepfakeBtn').addEventListener('click', async () => {
+    if (!uploadedFile || !uploadedFile.type.startsWith("video")) {
+      return alert("Please select a video file.");
+    }
+    const formData = new FormData();
+    formData.append('video', uploadedFile);
+    const response = await fetch('/predict_video', { method: 'POST', body: formData });
+    const data = await response.json();
+
+    // This displays the label ("Fake" or "Real") and the confidence from the server:
+    document.getElementById('result').innerHTML = `
+      <h3>Deepfake Detection Result (Video)</h3>
+      <p><strong>Label:</strong> ${data.label}</p>
+      <p><strong>Confidence:</strong> ${data.confidence}</p>
+      <video src="${data.file_path}" controls width="400"></video>
+    `;
+  });
+
+    // Compare Two Images
+    document.getElementById('compareBtn').addEventListener('click', async () => {
+      const image1 = document.getElementById('compareImage1').files[0];
+      const image2 = document.getElementById('compareImage2').files[0];
+      if (!image1 || !image2) return alert("Please upload both images.");
+
+      const formData = new FormData();
+      formData.append('image1', image1);
+      formData.append('image2', image2);
+
+      const response = await fetch('/compare_images', {
+        method: 'POST',
+        body: formData
+      });
+      const data = await response.json();
+      document.getElementById('result').innerHTML = `
+        <h3>Image Comparison</h3>
+        <p><strong>Result:</strong> ${data.similarity}</p>
+        <h4>Difference Heatmap</h4>
+        <img src="${data.diff}" />
+      `;
+    });
+    <!-- Remove Object from Image -->
+    <div class="section" id="remove">
+      <h2>Remove Object from Image</h2>
+      <p>Upload an image and draw on areas to remove.</p>
+      <a href="/remove">
+        <button class="btn">Launch Object Remover</button>
+      </a>
+    </div>
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,23 @@
+# Ignore virtual environment
+venv/
+
+# Python bytecode
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Logs
+*.log
+
+# Database files
+*.sqlite3
+
+# macOS
+.DS_Store
+
+# Environment variables
+.env
+
+# VSCode settings (optional)
+.vscode/

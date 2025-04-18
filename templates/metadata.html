@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Extract Metadata</title>
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+            color: #00ffe7;
+            text-align: center;
+            padding-top: 40px;
+        }
+        img.qr {
+            margin-top: 20px;
+            border: 5px solid #00ffe7;
+            border-radius: 8px;
+            width: 180px;
+        }
+        .flex {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            gap: 50px;
+        }
+        .section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            border-radius: 12px;
+        }
+        h2 {
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <h1>📁 Extract Metadata</h1>
+    <div class="flex">
+        <div class="section">
+            <h2>Upload from Device</h2>
+            <form id="uploadForm" enctype="multipart/form-data">
+                <input type="file" name="file" accept="image/*" required><br><br>
+                <button type="submit">Extract</button>
+            </form>
+            <div id="metadata" style="margin-top: 20px;"></div>
+        </div>
+
+        <div class="section">
+            <h2>Or Scan to Upload</h2>
+            <img class="qr" src="{{ url_for('static', filename='qr/metadata_upload_qr.png') }}" alt="Scan QR to Upload">
+            <p style="color: #ffffff;">Scan this QR code on your mobile device to access the metadata uploader.</p>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("uploadForm").onsubmit = async function (e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            const response = await fetch("/metadata", {
+                method: "POST",
+                body: formData
+            });
+            const data = await response.json();
+            let html = "<h3>Metadata:</h3><ul>";
+            for (const key in data.metadata) {
+                html += `<li><strong>${key}</strong>: ${data.metadata[key]}</li>`;
+            }
+            html += "</ul>";
+            document.getElementById("metadata").innerHTML = html;
+        };
+    </script>
+</body>
+</html>

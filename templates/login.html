@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Satyanetra - Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Poppins', sans-serif;
+      background: radial-gradient(circle at center, #0f0c29, #00c9ff, #92fe9d, #4facfe);
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      overflow: hidden;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-radius: 20px;
+      padding: 30px 40px;
+      width: 100%;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 0 20px rgba(0, 255, 195, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    h1 {
+      font-size: 2.3rem;
+      margin-bottom: 8px;
+      color: #3266df;
+      text-shadow: 0 0 12px #00ffc3;
+    }
+
+    h2 {
+      font-size: 1.1rem;
+      margin-bottom: 20px;
+      color: #c1e24d;
+      text-shadow: 0 0 6px #00ffc3;
+    }
+
+    .message {
+      margin-bottom: 15px;
+      background: rgba(255, 255, 255, 0.15);
+      padding: 10px;
+      border-radius: 10px;
+      font-weight: 500;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    label {
+      text-align: left;
+      font-weight: 500;
+      color: #000000;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255, 255, 255, 0.15);
+      color: #fff;
+      font-size: 1rem;
+      outline: none;
+      box-shadow: inset 0 0 10px rgba(0, 255, 195, 0.2);
+    }
+
+    input:focus {
+      box-shadow: 0 0 10px #00ffc3, inset 0 0 10px #00ffc3;
+      background-color: rgba(255, 255, 255, 0.25);
+    }
+
+    button[type="submit"] {
+      background:#3266df;
+      color: #0e0e0e;
+      padding: 10px 0;
+      border: none;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 1rem;
+      cursor: pointer;
+      box-shadow: 0 0 15px #00ffc3;
+      transition: 0.3s ease;
+    }
+
+    button:hover {
+      background: #00b38c;
+      color: #ffffff;
+      box-shadow: 0 0 20px #5389f4, 0 0 30px #00ffc3;
+    }
+
+    .links {
+      margin-top: 15px;
+    }
+
+    .links a {
+      color: #170b2c;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s;
+    }
+
+    .links a:hover {
+      color: #00ffc3;
+      text-shadow: 0 0 10px #00ffc3;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Satyanetra</h1>
+    <h2>Login</h2>
+
+    {% if get_flashed_messages() %}
+      <div class="message">
+        {% for message in get_flashed_messages() %}
+          {{ message }}
+        {% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" required />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+
+    <div class="links">
+      <a href="{{ url_for('register') }}">Don't have an account? Register</a>
+    </div>
+  </div>
+</body>
+</html>

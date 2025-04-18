@@ -1,0 +1,86 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    color: #fff;
+}
+
+.bg {
+    width: 100%;
+    min-height: 100vh;
+    background-image: url('https://dashboard.codeparrot.ai/api/image/Z-vbogz4-w8v6R2C/bg.png');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    padding: 20px;
+}
+
+.heading-container {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.main-heading {
+    font-family: 'Bakbak One', cursive;
+    font-size: 72px;
+    line-height: 80px;
+    text-transform: capitalize;
+    color: #fff;
+}
+
+.sub-heading {
+    font-size: 20px;
+    line-height: 30px;
+    font-weight: 400;
+}
+
+.button-container {
+    display: flex;
+    gap: 24px;
+}
+
+.detect-btn {
+    font-family: 'Bakbak One', cursive;
+    font-size: 16px;
+    line-height: 24px;
+    text-transform: uppercase;
+    padding: 12px 24px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.detect-image {
+    background-color: #21e786;
+    color: #141b22;
+}
+
+.detect-image:hover {
+    background-color: #1bc570;
+}
+
+.detect-video {
+    background-color: transparent;
+    border: 2px solid #21e786;
+    color: #fff;
+}
+
+.detect-video:hover {
+    background-color: rgba(33, 231, 134, 0.1);
+}
+

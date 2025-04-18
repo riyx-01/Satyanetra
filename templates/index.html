@@ -1,0 +1,397 @@
+{% set page = functionality %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Satyanetra - Dashboard</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Poppins:wght@400;600&display=swap');
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Orbitron', sans-serif;
+      color: #e0e0e0;
+      background: radial-gradient(circle at center, #0f0c29, #302b63, #24243e, #8e2de2, #4a00e0);
+      background-size: 400% 400%;
+      animation: radialFlow 30s ease infinite;
+      min-height: 100vh;
+    }
+
+    @keyframes radialFlow {
+      0% { background-position: center top; }
+      25% { background-position: left center; }
+      50% { background-position: center bottom; }
+      75% { background-position: right center; }
+      100% { background-position: center top; }
+    }
+
+    header {
+      background: rgba(0, 0, 0, 0.85);
+      padding: 26px 0 16px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(43, 192, 192, 0.15);
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 2.6em;
+      color: #00fff2;
+      letter-spacing: 1px;
+      text-shadow: 0 0 4px #00fff2;
+      opacity: 0.9;
+    }
+
+    nav ul {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 18px;
+      padding: 16px 0 4px;
+      margin: 0;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: #ffffff;
+      font-weight: 700;
+      font-size: 1.1em;
+      padding: 12px 24px;
+      border-radius: 14px;
+      background: rgba(0, 0, 0, 0.3);
+      box-shadow: 0 0 8px #00fff2;
+      transition: all 0.3s ease;
+    }
+
+    nav a:hover {
+      background-color: #00fff2;
+      color: #0e0e0e;
+      box-shadow: 0 0 24px #00fff2;
+    }
+
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 30px;
+    }
+
+    .section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 28px;
+      margin-bottom: 50px;
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+    }
+
+    .section h2 {
+      font-family: 'Orbitron', sans-serif;
+      color: #ffffff;
+      font-size: 1.6em;
+      text-shadow: 0 0 6px #00fff2;
+      margin-bottom: 16px;
+    }
+
+    .instructions {
+      font-family: 'Poppins', sans-serif;
+      font-size: 1.05em;
+      color: #e2f9ff;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 8px 24px rgba(0, 255, 255, 0.08);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      line-height: 1.6;
+    }
+
+    input[type="file"] {
+      margin-right: 12px;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 10px;
+      border-radius: 12px;
+      color: #fff;
+      border: 1px solid #00fff2;
+    }
+
+    .btn {
+      background: #00ffee;
+      color: #0e0e0e;
+      padding: 12px 28px;
+      border-radius: 12px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 1em;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 18px rgba(0, 255, 255, 0.4);
+    }
+
+    .btn:hover {
+      background: #00b3a6;
+      color: #ffffff;
+      box-shadow: 0 0 30px #00fff2;
+    }
+
+    img, video {
+      max-width: 100%;
+      margin-top: 15px;
+      border-radius: 12px;
+    }
+
+    form {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    #starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  </style>
+  <canvas id="starfield"></canvas>
+  <canvas id="starfield"></canvas>
+  <script>
+    window.onload = function () {
+      const canvas = document.getElementById("starfield");
+      const ctx = canvas.getContext("2d");
+  
+      let width = window.innerWidth;
+      let height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+  
+      let mouseX = width / 2;
+      let mouseY = height / 2;
+  
+      const stars = Array(150).fill().map(() => ({
+        baseX: Math.random() * width,
+        baseY: Math.random() * height,
+        radius: Math.random() * 1.5 + 0.3,
+        speed: Math.random() * 0.6 + 0.2,
+        offsetX: 0,
+        offsetY: 0,
+        opacity: Math.random()
+      }));
+  
+      function drawStars() {
+        ctx.clearRect(0, 0, width, height);
+        for (const star of stars) {
+          // Calculate parallax offset based on mouse
+          star.offsetX = (mouseX - width / 2) * (star.radius / 6);
+          star.offsetY = (mouseY - height / 2) * (star.radius / 6);
+  
+          ctx.beginPath();
+          ctx.arc(star.baseX + star.offsetX, star.baseY + star.offsetY, star.radius, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+          ctx.fill();
+  
+          star.baseY += star.speed;
+          if (star.baseY > height) {
+            star.baseY = 0;
+            star.baseX = Math.random() * width;
+          }
+        }
+        requestAnimationFrame(drawStars);
+      }
+  
+      drawStars();
+  
+      window.addEventListener("resize", () => {
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = width;
+        canvas.height = height;
+      });
+  
+      // Track mouse for parallax
+      window.addEventListener("mousemove", (e) => {
+        mouseX = e.clientX;
+        mouseY = e.clientY;
+      });
+    };
+  </script>
+  
+  
+</head>
+<body>
+  <header>
+    <h1>Welcome, {{ username }}!</h1>
+    <nav>
+      <ul>
+        <li><a href="/deepfake_image">Image</a></li>
+        <li><a href="/deepfake_video">Video</a></li>
+        <li><a href="/blur">Blur</a></li>
+        <li><a href="/metadata">Metadata</a></li>
+        <li><a href="/compare">Compare</a></li>
+        <li><a href="/transpose">Transpose</a></li>
+        <li><a href="/remove">Remove</a></li>
+        <li><a href="/live_detect">Live</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+
+  <div class="container">
+    {% if page == 'deepfake_image' %}
+    <div class="section">
+      <h2>Deepfake Image Detection</h2>
+      <div class="instructions">
+        1. Upload an image (JPG/PNG)<br>
+        2. Click "Detect" to analyze if it’s real or AI-generated.<br>
+        3. If fake, a heatmap will highlight suspicious regions.
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button class="btn" type="submit">Detect</button>
+      </form>
+      {% if result %}
+        <p><strong>Label:</strong> {{ result.label }}</p>
+        <p><strong>Confidence:</strong> {{ result.confidence }}%</p>
+        <img src="{{ result.file_path }}">
+        {% if result.heatmap %}
+        <p><strong>Heatmap:</strong></p>
+        <img src="{{ result.heatmap }}">
+      {% endif %}
+    {% endif %}
+    </div>
+
+    {% elif page == 'deepfake_video' %}
+    <div class="section">
+      <h2>Deepfake Video Detection</h2>
+      <div class="instructions">
+        1. Upload a short MP4 video.<br>
+        2. Click "Detect" to evaluate deepfake probability.<br>
+        3. A label and confidence score will appear.
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="video" accept="video/*">
+        <button class="btn" type="submit">Detect</button>
+      </form>
+      {% if result %}
+        <p><strong>Label:</strong> {{ result.label }}</p>
+        <p><strong>Confidence:</strong> {{ result.confidence }}</p>
+        <video controls><source src="{{ result.file_path }}" type="video/mp4"></video>
+      {% endif %}
+    </div>
+
+    {% elif page == 'blur' %}
+    <div class="section">
+      <h2>Blur Faces</h2>
+      <div class="instructions">
+        1. Upload a photo with visible faces.<br>
+        2. Click "Blur" to anonymize all detected faces.<br>
+        3. The output will replace faces with soft blur.
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button class="btn" type="submit">Blur</button>
+      </form>
+      {% if result %}
+        <img src="{{ result.output }}">
+      {% endif %}
+    </div>
+
+    {% elif page == 'metadata' %}
+    <div class="section">
+      <h2>Metadata Extraction</h2>
+      <div class="instructions">
+        1. Upload any image taken with a camera.<br>
+        2. Click "Extract" to view EXIF metadata like time, device, and GPS.<br>
+        3. Scroll through the extracted data list below.
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button class="btn" type="submit">Extract</button>
+      </form>
+      {% if metadata %}
+        <ul>
+          {% for key, value in metadata.items() %}
+          <li><strong>{{ key }}:</strong> {{ value }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    </div>
+
+    {% elif page == 'compare' %}
+    <div class="section">
+      <h2>Compare Images</h2>
+      <div class="instructions">
+        1. Upload two similar-looking images.<br>
+        2. Click "Compare" to calculate similarity score and differences.<br>
+        3. The app will highlight mismatches visually.
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="image1" accept="image/*">
+        <input type="file" name="image2" accept="image/*">
+        <button class="btn" type="submit">Compare</button>
+      </form>
+      {% if result %}
+        <p>Similarity: {{ result.similarity }}</p>
+        <p>Match %: {{ result.match_percent }}</p>
+        <div><img src="{{ result.image1 }}"><img src="{{ result.image2 }}"><img src="{{ result.diff }}"></div>
+      {% endif %}
+    </div>
+
+    {% elif page == 'transpose' %}
+    <div class="section">
+      <h2>Transpose Image</h2>
+      <div class="instructions">
+        1. Upload an image.<br>
+        2. Click "Transpose" to flip it horizontally (mirror view).<br>
+        3. Use this for correcting selfies or visual comparisons.
+      </div>
+      <form method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept="image/*">
+        <button class="btn" type="submit">Transpose</button>
+      </form>
+      {% if result %}
+        <img src="/{{ result.transposed }}">
+      {% endif %}
+    </div>
+
+    {% elif page == 'remove' %}
+    <div class="section">
+      <h2>Remove Object</h2>
+      <div class="instructions">
+        1. Click below to launch the object removal canvas.<br>
+        2. Upload an image, draw on unwanted areas, and click remove.<br>
+        3. The AI will fill in the masked region naturally.
+      </div>
+      <a href="/remove_tool">
+        <button class="btn">Launch</button>
+      </a>
+    </div>
+
+    {% elif page == 'live_detect' %}
+    <div class="section">
+      <h2>Live Face Detection</h2>
+      <div class="instructions">
+        1. Click "Start" to enable your webcam.<br>
+        2. The system will auto-detect and count faces in real-time.<br>
+        3. Useful for live monitoring or security simulation.
+      </div>
+      <button class="btn" onclick="document.getElementById('live').style.display='block'; this.style.display='none';">Start</button>
+      <div id="live" style="display:none; margin-top:20px">
+        <img src="/video_feed" width="640" height="480" style="border: 3px solid #00ffcc; border-radius: 10px; box-shadow: 0 0 10px #00ffcc;">
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+</body>
+</html>
+
+</body>
+</html>

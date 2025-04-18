@@ -1,0 +1,136 @@
+<!-- templates/deepfake_image.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Deepfake Image Detection</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(-45deg, #44718d, #ee9356, #8e9038, #94213f, #0e0e0e);
+      background-size: 400% 400%;
+      animation: gradientBG 20s ease infinite;
+      color: white;
+      padding: 20px;
+    }
+    @keyframes gradientBG {
+      0%   { background-position: 0% 50%; }
+      50%  { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+    header {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      text-align: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.7);
+    }
+    header h1 {
+      margin: 0;
+      font-size: 2em;
+      color: #00ffcc;
+    }
+    nav ul {
+      list-style: none;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      padding: 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    nav a:hover {
+      color: #00ffcc;
+    }
+    .container {
+      max-width: 700px;
+      margin: 40px auto;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 15px;
+    }
+    .btn {
+      background: #00ffcc;
+      color: black;
+      padding: 10px 18px;
+      margin-top: 15px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover {
+      background: #009977;
+      color: #fff;
+    }
+    img {
+      max-width: 100%;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Welcome, {{ username }}!</h1>
+    <nav>
+      <ul>
+        <li><a href="/deepfake_image">Image Detection</a></li>
+        <li><a href="/deepfake_video">Video Detection</a></li>
+        <li><a href="/blur">Blur Faces</a></li>
+        <li><a href="/metadata">Metadata</a></li>
+        <li><a href="/compare">Compare Images</a></li>
+        <li><a href="/transpose">Transpose</a></li>
+        <li><a href="/remove">Remove Object</a></li>
+        <li><a href="/live_detect">Live Detection</a></li>
+        <li><a href="/logout">Logout</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="container">
+    <h2 style="color: #00ffcc;">Deepfake Image Detection</h2>
+    <p>Upload an image to detect if it’s real or fake:</p>
+    <input type="file" id="dfiFile" accept="image/*">
+    <button class="btn" id="dfiBtn">Detect</button>
+    <div id="dfiResult"></div>
+  </div>
+
+  <script>
+    const dfiFile = document.getElementById('dfiFile');
+    const dfiBtn = document.getElementById('dfiBtn');
+    const dfiResult = document.getElementById('dfiResult');
+
+    dfiBtn.addEventListener('click', async () => {
+      if (!dfiFile.files.length) {
+        alert("Please select an image first.");
+        return;
+      }
+      dfiResult.innerHTML = "Analyzing image...";
+      const formData = new FormData();
+      formData.append('file', dfiFile.files[0]);
+
+      try {
+        const res = await fetch('/predict', { method: 'POST', body: formData });
+        const data = await res.json();
+        if (data.error) {
+          dfiResult.innerHTML = `<p style="color:red;">Error: ${data.error}</p>`;
+        } else {
+          const confidence = (data.confidence * 100).toFixed(2);
+          dfiResult.innerHTML = `
+            <p><strong>Label:</strong> ${data.label}</p>
+            <p><strong>Confidence:</strong> ${confidence}%</p>
+            <img src="${data.file_path}" alt="Analyzed Image" />
+            ${ data.label === "Fake" && data.heatmap ? `<p>Heatmap:</p><img src="${data.heatmap}" alt="Heatmap" />` : '' }
+          `;
+        }
+      } catch (err) {
+        dfiResult.innerHTML = `<p style="color:red;">Error: ${err.message}</p>`;
+      }
+    });
+  </script>
+</body>
+</html>
